@@ -34,6 +34,8 @@ resource "azurerm_logic_app_workflow" "demo" {
   }
   workflow_schema  = "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
   workflow_version = "1.0.0.0"
+
+  depends_on = [ azurerm_api_connection.acsemail, data.azurerm_managed_api.acsemail ]
 }
 
 resource "azurerm_logic_app_trigger_custom" "trigger" {
@@ -64,25 +66,6 @@ resource "azurerm_logic_app_trigger_custom" "trigger" {
             
   })
 
-}
-
-resource "azurerm_logic_app_action_custom" "step_1" {
-  body = jsonencode({
-    inputs = {
-      body       = "good"
-      statusCode = 200
-    }
-    kind = "Http"
-    runAfter = {
-      Send_email = ["Succeeded"]
-    }
-    type = "Response"
-  })
-  logic_app_id = azurerm_logic_app_workflow.demo.id
-  name         = "Response"
-  depends_on = [
-    azurerm_logic_app_workflow.demo,
-  ]
 }
 
 resource "azurerm_logic_app_action_custom" "step_2" {
@@ -119,5 +102,25 @@ resource "azurerm_logic_app_action_custom" "step_2" {
   name         = "Send_email"
   depends_on = [
     azurerm_logic_app_workflow.demo,
+  ]
+}
+
+resource "azurerm_logic_app_action_custom" "step_3" {
+  body = jsonencode({
+    inputs = {
+      body       = "good"
+      statusCode = 200
+    }
+    kind = "Http"
+    runAfter = {
+      Send_email = ["Succeeded"]
+    }
+    type = "Response"
+  })
+  logic_app_id = azurerm_logic_app_workflow.demo.id
+  name         = "Response"
+  depends_on = [
+    azurerm_logic_app_workflow.demo,
+    azurerm_logic_app_action_custom.step_2
   ]
 }

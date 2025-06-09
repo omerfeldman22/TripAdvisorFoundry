@@ -20,3 +20,13 @@ resource "azurerm_role_assignment" "ai_user" {
   role_definition_name = "Azure AI User"
   principal_id         = azuread_user.demo.object_id
 }
+
+data "azuread_group" "demo" {
+  display_name = "foundry-agents-demo-group"
+}
+
+
+resource "azuread_group_member" "demo" {
+  group_object_id  = data.azuread_group.demo.object_id
+  member_object_id = azuread_user.demo.object_id
+}

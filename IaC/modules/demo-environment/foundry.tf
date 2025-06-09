@@ -36,15 +36,15 @@ resource "azurerm_ai_foundry_project" "demo" {
 
 locals {
   models = {
-    "gpt-4o" = {
-      name     = "gpt-4o"
-      version  = "2024-11-20"
-      capacity = 20
+    "gpt-4o-mini" = {
+      name     = "gpt-4o-mini"
+      version  = "2024-07-18"
+      capacity = 120
     }
   }
 }
 
-resource "azurerm_cognitive_deployment" "gpt4o" {
+resource "azurerm_cognitive_deployment" "models" {
   for_each = local.models
 
   name                 = each.key
